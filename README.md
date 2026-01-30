@@ -1,123 +1,87 @@
-# BRD to User Story Generator
+# 🎯 BRD to User Story Generator
 
-> **Enterprise AI Solution by Embridge**  
-> Convert Business Requirement Documents into Agile user stories using Azure OpenAI
+> **Enterprise AI-powered tool to transform Business Requirement Documents into production-ready Agile user stories**
 
-![Version](https://img.shields.io/badge/version-1.0.0-yellow)
-![Python](https://img.shields.io/badge/python-3.8+-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![Powered by Groq](https://img.shields.io/badge/Powered%20by-Groq%20AI-orange)](https://groq.com/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-red)](https://streamlit.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+![BRD to User Story Generator](https://img.shields.io/badge/Status-Production%20Ready-success)
 
 ---
 
-## 🎯 Overview
+## ✨ Features
 
-An enterprise-grade Streamlit application that transforms Business Requirement Documents (BRDs) into comprehensive, Jira/Azure DevOps-compatible user stories using Azure OpenAI's advanced AI capabilities.
+### 🚀 **6-Stage AI Processing Pipeline**
+1. **📄 BRD Parsing & Analysis** - Analyzes document structure and completeness
+2. **📋 Requirement Extraction** - Categorizes functional & non-functional requirements
+3. **🎯 Context Synthesis** - Derives business context and user personas
+4. **✍️ User Story Generation** - Creates Jira/Azure DevOps compatible stories
+5. **✔️ QA & Validation** - Validates coverage and testability
+6. **📦 Output Transformation** - Prepares multi-format exports
 
-### Key Features
+### 🎨 **Modern, Beautiful UI**
+- Stunning gradient-based design with Embridge branding
+- Dark blue sidebar with vibrant yellow accents
+- Real-time progress tracking with visual indicators
+- Interactive help system
 
-- **6-Stage AI Processing Pipeline**
-  - BRD Parsing & Analysis
-  - Requirement Extraction with Traceability
-  - Business Context Synthesis
-  - User Story Generation
-  - QA & Coverage Validation
-  - Multi-Format Output Transformation
+### 📤 **Multi-Format Export**
+- **PDF** - Executive-ready presentation format
+- **Excel** - Jira/Azure DevOps importable spreadsheet
+- **Word** - Comprehensive documentation
+- **TXT** - Plain text for easy sharing
 
-- **Multi-Format Export**
-  - PDF (Executive-ready format)
-  - Excel (Jira/Azure DevOps importable)
-  - Word (Documentation style)
-  - Plain Text
-
-- **Enterprise Branding**
-  - Embridge white & yellow theme
-  - Professional UI/UX
-  - Real-time progress tracking
-  - Comprehensive error handling
+### ⚡ **Powered by Groq AI**
+- **Blazing fast** inference with Llama 3.3 70B
+- **Enterprise-grade** quality and accuracy
+- **Generous free tier** (14,400 requests/day)
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
 - Python 3.8 or higher
-- Azure OpenAI API access
-- Azure OpenAI deployment (GPT-4 recommended)
+- Groq API key ([Get one free](https://console.groq.com/))
 
 ### Installation
 
-1. **Clone or navigate to the project directory**
-   ```bash
-   cd d:\antigravity-projects\brd_to_userstory_generator
-   ```
+1. **Clone the repository**
+```bash
+git clone https://github.com/MSrikanthkarthikeyan/BRD-to-User-Story-Generation.git
+cd BRD-to-User-Story-Generation
+```
 
 2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-3. **Configure Azure OpenAI**
-   
-   Copy the example environment file:
-   ```bash
-   copy .env.example .env
-   ```
-   
-   Edit `.env` and add your Azure OpenAI credentials:
-   ```env
-   AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-   AZURE_OPENAI_API_KEY=your-api-key-here
-   AZURE_OPENAI_DEPLOYMENT=gpt-4
-   AZURE_OPENAI_API_VERSION=2024-02-15-preview
-   ```
+3. **Configure API Key**
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env and add your Groq API key
+GROQ_API_KEY=your-groq-api-key-here
+```
 
 4. **Run the application**
-   ```bash
-   streamlit run app.py
-   ```
+```bash
+streamlit run app.py
+```
 
-The application will open in your browser at `http://localhost:8501`
-
----
-
-## 📖 Usage Guide
-
-### Step-by-Step Workflow
-
-1. **Upload BRD Document**
-   - Supported formats: PDF, DOCX, TXT
-   - Click "Browse files" in the Upload tab
-   - Select your Business Requirement Document
-
-2. **Start Processing**
-   - Click "🚀 Start Processing" button
-   - Monitor real-time progress through 6 stages:
-     1. BRD Parsing - Document structure analysis
-     2. Requirement Extraction - Categorized requirements with traceability
-     3. Context Synthesis - Business context and user personas
-     4. User Story Generation - Enterprise Agile user stories
-     5. QA Validation - Coverage and quality checks
-     6. Output Transformation - Format-ready structures
-
-3. **Review Results**
-   - Navigate to "Results" tab
-   - Expand each stage to view JSON outputs
-   - Check summary metrics (stories count, coverage, quality score)
-
-4. **Export User Stories**
-   - Navigate to "Export" tab
-   - Choose your desired format:
-     - **PDF** - Executive presentation format
-     - **Excel** - Import directly into Jira/Azure DevOps
-     - **Word** - Comprehensive documentation
-     - **TXT** - Plain text for easy sharing
+5. **Open your browser**
+- The app will automatically open at `http://localhost:8501`
+- Upload your BRD document (PDF, DOCX, or TXT)
+- Click "Start AI Processing"
+- Download your user stories in your preferred format
 
 ---
 
-## 🏗️ Architecture
-
-### Project Structure
+## 📁 Project Structure
 
 ```
 brd_to_userstory_generator/
@@ -125,57 +89,80 @@ brd_to_userstory_generator/
 ├── config.py                   # Configuration management
 ├── requirements.txt            # Python dependencies
 ├── .env.example               # Environment template
-├── README.md                  # This file
-├── modules/
+├── .gitignore                 # Git ignore rules
+├── verify_setup.py            # Installation verification
+│
+├── modules/                   # Core processing modules
 │   ├── __init__.py
-│   ├── brd_parser.py          # Task 1: BRD parsing
-│   ├── requirement_extractor.py # Task 2: Requirement extraction
-│   ├── context_synthesizer.py  # Task 3: Context synthesis
-│   ├── story_generator.py      # Task 4: User story generation
-│   ├── qa_validator.py         # Task 5: QA validation
-│   ├── output_transformer.py   # Task 6: Output transformation
-│   ├── openai_service.py       # Azure OpenAI integration
-│   └── export_handlers.py      # Export functionality
-├── prompts/
-│   ├── task1_brd_parsing.txt
-│   ├── task2_extraction.txt
-│   ├── task3_synthesis.txt
-│   ├── task4_generation.txt
-│   ├── task5_validation.txt
-│   └── task6_transformation.txt
-├── assets/                     # Brand assets
-└── exports/                    # Generated output files
-```
-
-### Processing Pipeline
-
-```
-BRD Upload → Parsing → Extraction → Synthesis → Generation → Validation → Export
-    ↓           ↓          ↓            ↓            ↓            ↓          ↓
-  File       Structure  Requirements  Context    User Stories   QA Check  PDF/Excel/
-  Input      Analysis   Categorized   Derived    Generated      Coverage  Word/TXT
+│   ├── groq_service.py       # Groq API integration
+│   ├── brd_parser.py         # BRD document parser
+│   ├── requirement_extractor.py
+│   ├── context_synthesizer.py
+│   ├── story_generator.py
+│   ├── qa_validator.py
+│   ├── output_transformer.py
+│   └── export_handlers.py    # Multi-format export
+│
+└── prompts/                   # AI prompt templates
+    ├── task1_brd_parsing.txt
+    ├── task2_extraction.txt
+    ├── task3_synthesis.txt
+    ├── task4_generation.txt
+    ├── task5_validation.txt
+    └── task6_transformation.txt
 ```
 
 ---
 
-## 🔧 Configuration
+## 🎯 How It Works
 
-### Azure OpenAI Settings
+### 1. **Upload Your BRD**
+Upload your Business Requirement Document in PDF, DOCX, or TXT format.
 
-Edit `.env` file or configure via the Streamlit sidebar:
+### 2. **AI Processing**
+The system processes your document through 6 intelligent stages:
+- Analyzes document structure and quality
+- Extracts and categorizes all requirements
+- Synthesizes business context and user personas
+- Generates enterprise-standard user stories
+- Validates quality and coverage
+- Prepares export-ready formats
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `AZURE_OPENAI_ENDPOINT` | Your Azure OpenAI resource endpoint | `https://your-resource.openai.azure.com/` |
-| `AZURE_OPENAI_API_KEY` | API key for authentication | `your-api-key-here` |
-| `AZURE_OPENAI_DEPLOYMENT` | Model deployment name | `gpt-4` or `gpt-4-turbo` |
-| `AZURE_OPENAI_API_VERSION` | API version | `2024-02-15-preview` |
+### 3. **Review & Export**
+- View detailed results for each processing stage
+- Check summary metrics (stories, coverage, quality score)
+- Download in your preferred format (PDF, Excel, Word, TXT)
 
-### Model Recommendations
+---
 
-- **GPT-4**: Best quality, comprehensive analysis
-- **GPT-4-Turbo**: Faster processing, good quality
-- **GPT-3.5-Turbo**: Budget option, basic analysis
+## 🛠️ Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+# Groq API Configuration (Required)
+GROQ_API_KEY=your-groq-api-key-here
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# Optional: Customize settings
+APP_NAME=BRD to User Story Generator
+APP_BRAND=Embridge
+```
+
+### Getting a Groq API Key
+
+1. Visit [console.groq.com](https://console.groq.com/)
+2. Sign up for a free account
+3. Navigate to API Keys section
+4. Generate a new API key
+5. Copy and paste into your `.env` file
+
+**Free Tier Limits:**
+- 14,400 requests per day
+- 30 requests per minute
+- Perfect for production use
 
 ---
 
@@ -183,109 +170,146 @@ Edit `.env` file or configure via the Streamlit sidebar:
 
 ### PDF Export
 - Executive-ready presentation format
-- Organized by epics and user stories
-- Includes traceability matrix
-- Embridge branding (yellow highlights)
+- Professional layout with Embridge branding
+- Ideal for stakeholder reviews
 
-### Excel Export (Jira-Compatible)
-- Flat table structure
-- Headers: Story ID, Title, User Role, Description, Acceptance Criteria, Priority, Story Points, Status, Dependencies, Epic, BRD Reference
-- Ready for CSV/Excel import into Jira or Azure DevOps
-- Embridge header styling
+### Excel Export
+- **Jira/Azure DevOps compatible**
+- Ready-to-import spreadsheet
+- Structured columns for all story fields
 
 ### Word Export
-- Professional documentation format
-- Hierarchical structure (Epics → Stories)
-- Tables for traceability matrix
-- Suitable for stakeholder review
+- Comprehensive documentation format
+- Detailed user stories with full context
+- Perfect for detailed analysis
 
 ### TXT Export
 - Plain text format
-- Easy to share via email or chat
-- Human-readable structure
-- No special software required
+- Easy to share and edit
+- Simple backup format
 
 ---
 
-## 🛠️ Troubleshooting
+## 🎨 UI Features
 
-### Common Issues
+### Stunning Modern Design
+- **Vibrant gradients** - No transparency, solid professional colors
+- **Modern typography** - Inter font family throughout
+- **Smooth animations** - Button hovers, page transitions
+- **Professional cards** - Elevated design with shadows
+- **Color-coded metrics** - 🟢 Green, 🟡 Yellow, 🔴 Red quality indicators
 
-**Issue: "Missing configuration" error**
-- **Solution**: Ensure `.env` file is properly configured with all required Azure OpenAI credentials
+### Real-Time Progress
+- **6-stage pipeline visualization** - See exactly where processing is
+- **Progress bar** - Visual feedback during processing
+- **Status indicators** - ✅ Complete, 🔄 Processing, ⏳ Pending
 
-**Issue: API call failures**
-- **Solution**: Verify API key is valid and deployment name matches your Azure resource
-
-**Issue: File upload errors**
-- **Solution**: Ensure file is in supported format (PDF, DOCX, TXT) and not corrupted
-
-**Issue: Export button not working**
-- **Solution**: Complete all processing stages before attempting export
-
-**Issue: Slow processing**
-- **Solution**: Large documents may take several minutes. GPT-4-Turbo is faster than GPT-4
-
----
-
-## 📝 Best Practices
-
-### For Best Results
-
-1. **BRD Quality**
-   - Use well-structured BRDs with clear sections
-   - Include explicit functional and non-functional requirements
-   - Define stakeholders and success criteria
-
-2. **Model Selection**
-   - Use GPT-4 for complex, critical projects
-   - Use GPT-4-Turbo for faster turnaround
-   - Lower temperature (0.2-0.3) for analytical tasks
-
-3. **Review Process**
-   - Always review generated user stories
-   - Check acceptance criteria for testability
-   - Verify traceability to BRD requirements
-
-4. **Export Strategy**
-   - Use Excel for Jira/Azure DevOps import
-   - Use PDF for stakeholder presentations
-   - Use Word for detailed documentation
-   - Use TXT for quick sharing
+### Interactive Help
+- **Collapsible help section** - Quick guide always available
+- **Tooltips** - Helpful hints on metrics and features
+- **Error messages** - Clear guidance when issues occur
 
 ---
 
-## 🔐 Security Notes
+## 🔒 Security
 
-- Never commit `.env` file to version control
-- Rotate API keys regularly
-- Use Azure RBAC for access control
-- Review generated content before external sharing
+### Best Practices
+- ✅ API keys stored in `.env` file (not in code)
+- ✅ `.env` file added to `.gitignore`
+- ✅ No sensitive data committed to repository
+- ✅ Secure API communication via HTTPS
+
+### Data Privacy
+- All processing happens via Groq's secure API
+- No data is stored beyond the current session
+- Uploaded files are temporarily stored and cleared on reset
 
 ---
 
-## 🤝 Support
+## 🧪 Verification
 
-For issues, questions, or feature requests:
-- Contact: Embridge AI Solutions Team
-- Documentation: See implementation plan in `brain/` directory
+Run the verification script to check your installation:
+
+```bash
+python verify_setup.py
+```
+
+This will check:
+- ✅ Python version compatibility
+- ✅ All required dependencies
+- ✅ Project structure integrity
+- ✅ Configuration status
+
+---
+
+## 📝 Sample Usage
+
+```python
+# Example: Processing a BRD programmatically
+from modules.brd_parser import BRDParser
+from modules.groq_service import GroqService
+
+# Initialize parser
+parser = BRDParser()
+
+# Parse BRD
+result = parser.parse_brd("path/to/your/brd.pdf")
+
+# View analysis
+print(f"Completeness Score: {result['completeness_score']}/100")
+print(f"Sections Found: {len(result['sections_identified'])}")
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-Copyright © 2026 Embridge. All rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🎨 Embridge Branding
+## 🙏 Acknowledgments
 
-The application features Embridge's signature white & yellow theme:
-- **Primary Color**: Yellow (`#FFD700`)
-- **Background**: White (`#FFFFFF`)
-- **Text**: Dark Gray (`#1F1F1F`)
-- **Accent**: Light Yellow (`#FFFEF0`)
+- **Groq AI** - For providing blazing-fast LLM inference
+- **Streamlit** - For the amazing web app framework
+- **Embridge** - Enterprise AI Solutions platform
 
 ---
 
-**Built with ❤️ by Embridge AI Solutions**
+## 📧 Contact & Support
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/MSrikanthkarthikeyan/BRD-to-User-Story-Generation/issues)
+- **Repository**: [github.com/MSrikanthkarthikeyan/BRD-to-User-Story-Generation](https://github.com/MSrikanthkarthikeyan/BRD-to-User-Story-Generation)
+
+---
+
+## 🚀 Roadmap
+
+- [ ] Support for additional AI providers (Azure OpenAI, Anthropic)
+- [ ] Batch processing for multiple BRDs
+- [ ] Custom prompt template editor
+- [ ] Integration with Jira/Azure DevOps APIs
+- [ ] User story refinement and editing UI
+- [ ] Template library for different industries
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Embridge Team**
+
+Powered by ⚡ [Groq AI](https://groq.com/) • Built with 🎈 [Streamlit](https://streamlit.io/)
+
+</div>
