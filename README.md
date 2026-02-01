@@ -300,12 +300,4 @@ Developed for Enbridge. Internal use only.
 
 ---
 
-## 🙏 Acknowledgments
-
-**Developed by**: M Srikanth Karthikeyan (Intern)  
-**For**: Enbridge GenAI Solutions  
-**Powered by**: Azure OpenAI GPT-4o
-
----
-
 **Ready to transform your BRDs into professional user stories! 🚀**
