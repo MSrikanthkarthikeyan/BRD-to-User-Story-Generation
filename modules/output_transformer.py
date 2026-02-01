@@ -3,13 +3,13 @@ Task 6: Output Transformation Module
 Transforms user stories into export-ready structures
 """
 import json
-from modules.groq_service import GroqService
+from modules.llm_service import LLMService
 
 class OutputTransformer:
     """Transform user stories for multiple export formats"""
     
     def __init__(self):
-        self.groq_service = GroqService()
+        self.llm_service = LLMService()
     
     def transform_for_export(self, stories: dict, context: dict) -> dict:
         """
@@ -23,7 +23,7 @@ class OutputTransformer:
             JSON result with structures for PDF, Excel, Word, and TXT
         """
         # Load prompt template
-        system_prompt = self.groq_service.load_prompt_template('task6_transformation')
+        system_prompt = self.llm_service.load_prompt_template('task6_transformation')
         
         # Prepare transformation input
         user_prompt = f"""Transform the following user stories into export-ready structures.
@@ -37,7 +37,7 @@ USER STORIES:
 Create structured formats for PDF, Excel, Word, and TXT exports. Return the JSON structure as specified."""
         
         # Execute transformation via Groq
-        result = self.groq_service.execute_prompt(
+        result = self.llm_service.execute_prompt(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.2

@@ -3,13 +3,13 @@ Task 5: QA Validation Module
 Validates user stories for quality and coverage
 """
 import json
-from modules.groq_service import GroqService
+from modules.llm_service import LLMService
 
 class QAValidator:
     """Validate user stories for quality, coverage, and testability"""
     
     def __init__(self):
-        self.groq_service = GroqService()
+        self.llm_service = LLMService()
     
     def validate_stories(self, requirements: dict, stories: dict) -> dict:
         """
@@ -23,7 +23,7 @@ class QAValidator:
             JSON result with validation findings and quality score
         """
         # Load prompt template
-        system_prompt = self.groq_service.load_prompt_template('task5_validation')
+        system_prompt = self.llm_service.load_prompt_template('task5_validation')
         
         # Prepare validation context
         user_prompt = f"""Validate the following user stories against the original requirements.
@@ -44,7 +44,7 @@ STORIES DATA:
 Validate for coverage, redundancy, ambiguity, and testability. Flag issues only. Return the JSON structure as specified."""
         
         # Execute validation via Groq
-        result = self.groq_service.execute_prompt(
+        result = self.llm_service.execute_prompt(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.2  # Lower for analytical validation

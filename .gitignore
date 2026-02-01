@@ -4,9 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -23,35 +20,47 @@ wheels/
 .installed.cfg
 *.egg
 
-# Environment variables (IMPORTANT - contains API keys)
-.env
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Operating System
+# Environment variables - NEVER COMMIT
+.env
+
+# Temporary files
+*.log
+*.tmp
+temp/
+tmp/
+*.cache
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Project specific
+# Streamlit
+.streamlit/secrets.toml
+
+# Output files
+output/
 exports/
 *.pdf
 *.xlsx
 *.docx
-samples/
-temp/
-uploads/
 
-# Streamlit
-.streamlit/
+# OCR Debug
+ocr_debug/
 
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-.cache/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/

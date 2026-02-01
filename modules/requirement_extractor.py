@@ -2,13 +2,13 @@
 Task 2: Requirement Extraction Module
 Extracts and categorizes requirements from parsed BRD
 """
-from modules.groq_service import GroqService
+from modules.llm_service import LLMService
 
 class RequirementExtractor:
     """Extract and categorize requirements from BRD"""
     
     def __init__(self):
-        self.groq_service = GroqService()
+        self.llm_service = LLMService()
     
     def extract_requirements(self, brd_text: str, parsing_result: dict) -> dict:
         """
@@ -22,7 +22,7 @@ class RequirementExtractor:
             JSON result with categorized requirements
         """
         # Load prompt template
-        system_prompt = self.groq_service.load_prompt_template('task2_extraction')
+        system_prompt = self.llm_service.load_prompt_template('task2_extraction')
         
         # Prepare user prompt with BRD content and parsing context
         user_prompt = f"""Extract requirements from the following BRD.
@@ -37,7 +37,7 @@ BRD CONTENT:
 Extract all requirements with precision, traceability, and confidence levels. Return the JSON structure as specified."""
         
         # Execute extraction via Groq
-        result = self.groq_service.execute_prompt(
+        result = self.llm_service.execute_prompt(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.2

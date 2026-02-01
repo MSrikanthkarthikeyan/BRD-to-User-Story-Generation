@@ -1,23 +1,31 @@
 """
 Configuration management for BRD to User Story Generator
+Loads API keys and settings from .env file
 """
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from .env file in project root
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 class Config:
     """Application configuration"""
     
-    # Groq API Configuration
+    # Azure OpenAI Configuration (Primary LLM)
+    AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY", "")
+    AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+    AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
+    AZURE_OPENAI_MODEL = os.getenv("AZURE_OPENAI_MODEL", "gpt-4o")
+    AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
+    
+    # Groq API Configuration (OCR Vision Only)
     GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-    GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")  # Fast and accurate
     
     # Application Settings
     APP_NAME = "BRD to User Story Generator"
-    APP_BRAND = "Embridge"
+    APP_BRAND = "Enbridge"
     
     # UI Theme (Embridge branding)
     THEME_PRIMARY_COLOR = "#FFD700"  # Yellow
@@ -44,8 +52,12 @@ class Config:
     def validate(cls):
         """Validate required configuration"""
         missing = []
+        if not cls.AZURE_OPENAI_KEY:
+            missing.append("AZURE_OPENAI_KEY")
+        if not cls.AZURE_OPENAI_ENDPOINT:
+            missing.append("AZURE_OPENAI_ENDPOINT")
         if not cls.GROQ_API_KEY:
-            missing.append("GROQ_API_KEY")
+            missing.append("GROQ_API_KEY (required for OCR)")
         
         return missing
     
