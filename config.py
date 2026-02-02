@@ -20,9 +20,6 @@ class Config:
     AZURE_OPENAI_MODEL = os.getenv("AZURE_OPENAI_MODEL", "gpt-4o")
     AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview")
     
-    # Groq API Configuration (OCR Vision Only)
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-    
     # Application Settings
     APP_NAME = "BRD to User Story Generator"
     APP_BRAND = "Enbridge"
@@ -56,8 +53,7 @@ class Config:
             missing.append("AZURE_OPENAI_KEY")
         if not cls.AZURE_OPENAI_ENDPOINT:
             missing.append("AZURE_OPENAI_ENDPOINT")
-        if not cls.GROQ_API_KEY:
-            missing.append("GROQ_API_KEY (required for OCR)")
+        # Removed GROQ_API_KEY requirement - now using Azure only
         
         return missing
     

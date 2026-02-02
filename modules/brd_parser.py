@@ -21,6 +21,8 @@ class BRDParser:
     
     def __init__(self):
         self.llm_service = LLMService()
+        self._cached_text = None  # Cache extracted text to avoid re-extraction
+        self._cached_file_path = None
         
         # Try to set Tesseract path for Windows
         if OCR_AVAILABLE:
@@ -41,6 +43,7 @@ class BRDParser:
     def extract_text_from_file(self, file_path: str) -> str:
         """
         Extract text content from various file formats
+        Uses caching to avoid re-extracting the same file
         
         Args:
             file_path: Path to the uploaded BRD file
@@ -48,17 +51,28 @@ class BRDParser:
         Returns:
             Extracted text content
         """
+        # Check cache first to avoid duplicate extraction
+        if self._cached_file_path == file_path and self._cached_text is not None:
+            print("📝 Using cached text (avoiding duplicate extraction)")
+            return self._cached_text
+        
         path = Path(file_path)
         extension = path.suffix.lower()
         
         if extension == '.pdf':
-            return self._extract_from_pdf(file_path)
+            extracted_text = self._extract_from_pdf(file_path)
         elif extension in ['.docx', '.doc']:
-            return self._extract_from_docx(file_path)
+            extracted_text = self._extract_from_docx(file_path)
         elif extension == '.txt':
-            return self._extract_from_txt(file_path)
+            extracted_text = self._extract_from_txt(file_path)
         else:
             raise ValueError(f"Unsupported file format: {extension}")
+        
+        # Cache the result
+        self._cached_file_path = file_path
+        self._cached_text = extracted_text
+        
+        return extracted_text
     
     def _extract_from_pdf(self, file_path: str) -> str:
         """Extract text from PDF file with Groq Vision OCR fallback for image-based PDFs"""
@@ -86,30 +100,32 @@ class BRDParser:
         combined_text = "\n\n".join(text)
         words_count = len(combined_text.split())
         
-        # If we have very little text or many OCR NEEDED markers, use Groq Vision OCR
+        # If we have very little text or many OCR NEEDED markers, use Azure Vision OCR
         if words_count < 100 or combined_text.count("OCR NEEDED") > 0:
             print(f"📸 PDF appears to be image-based ({words_count} words extracted)")
-            print("🚀 Using FREE Groq Vision OCR (no installation required)...")
+            print("🚀 Using Azure OpenAI Vision OCR (enterprise-grade)...")
             
             try:
-                from modules.groq_vision_ocr import GroqVisionOCR
+                from modules.azure_vision_ocr import AzureVisionOCR
                 
-                groq_ocr = GroqVisionOCR()
-                # Enable debug mode to save images and extracted text
-                ocr_text = groq_ocr.extract_text_from_pdf_pages(file_path, debug=True)
+                azure_ocr = AzureVisionOCR()
+                # Disable debug mode for faster processing (no image saving)
+                ocr_text = azure_ocr.extract_text_from_pdf_pages(file_path, debug=False)
                 
-                if ocr_text and len(ocr_text) > len(combined_text) and not ocr_text.startswith("Error"):
-                    print("✅ Groq Vision OCR successful!")
-                    return ocr_text
-                elif ocr_text.startswith("⚠️"):
-                    # pdf2image not available, inform user
-                    print(ocr_text)
-                    return combined_text if combined_text.strip() else ocr_text
+                # ALWAYS return after OCR attempt - do not continue to avoid infinite loop
+                if ocr_text and not ocr_text.startswith("Error"):
+                    print("✅ Azure Vision OCR successful!")
+                    return ocr_text  # Return immediately - DO NOT fall through
+                else:
+                    print(f"⚠️ OCR returned: {ocr_text[:100] if ocr_text else 'No text'}")
+                    return combined_text if combined_text.strip() else "No text extracted from PDF"
                     
             except Exception as e:
-                print(f"⚠️ Groq Vision OCR failed: {e}")
+                print(f"⚠️ Azure Vision OCR failed: {e}")
+                return combined_text if combined_text.strip() else f"OCR Error: {str(e)}"
         
-        return combined_text if combined_text.strip() else "⚠️ No text extracted. This appears to be an image-based PDF. Install pdf2image for OCR support: pip install pdf2image"
+        # Only reach here if standard extraction worked
+        return combined_text if combined_text.strip() else "⚠️ No text extracted from PDF"
     
     def _extract_with_ocr(self, file_path: str, use_mistral: bool = False) -> str:
         """Extract text from PDF using Tesseract OCR

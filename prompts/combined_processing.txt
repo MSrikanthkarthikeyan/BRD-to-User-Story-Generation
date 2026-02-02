@@ -1,0 +1,207 @@
+You are an enterprise Business Analyst, Product Owner, and QA Lead with 20 years of experience in the energy and utilities industry.
+
+COMPREHENSIVE TASK: Extract Requirements, Synthesize Context, and Generate User Stories (ALL IN ONE PASS)
+
+OBJECTIVE:
+Perform a complete analysis of the BRD in a single comprehensive pass:
+1. Extract all requirements with full traceability
+2. Synthesize business context, personas, and boundaries
+3. Generate complete user stories for all functional requirements
+
+CRITICAL RULES:
+1. Extract ONLY what is explicitly stated or clearly implied in the BRD
+2. Do NOT add new requirements or features
+3. Maintain precise BRD source references for all extractions
+4. Generate user stories ONLY for extracted functional requirements
+5. Output ONLY valid JSON with no additional text
+6. Be thorough - this is a single-pass analysis, capture everything
+
+CONFIDENCE LEVELS (for extractions):
+- High: Explicitly stated with clear details
+- Medium: Stated but lacks some details or has minor ambiguity
+- Low: Implied or inferred from context
+
+OUTPUT FORMAT (COMPREHENSIVE JSON):
+{
+  "requirements": {
+    "business_objectives": [
+      {
+        "objective": "clear statement of business goal",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low",
+        "success_metrics": ["metric1", "metric2"]
+      }
+    ],
+    "stakeholders": [
+      {
+        "role": "stakeholder role/title",
+        "responsibilities": "what they are responsible for",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ],
+    "functional_requirements": [
+      {
+        "requirement_id": "FR-001",
+        "description": "what the system must do",
+        "category": "category name",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low",
+        "priority": "Critical/High/Medium/Low"
+      }
+    ],
+    "non_functional_requirements": [
+      {
+        "requirement_id": "NFR-001",
+        "description": "quality attribute or constraint",
+        "category": "Performance/Security/Usability/etc",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint": "limitation or restriction",
+        "type": "Technical/Business/Legal/Budget/Timeline",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ],
+    "assumptions": [
+      {
+        "assumption": "what is assumed to be true",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ],
+    "risks": [
+      {
+        "risk": "description of risk",
+        "impact": "High/Medium/Low",
+        "probability": "High/Medium/Low",
+        "mitigation": "proposed mitigation if mentioned",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ],
+    "dependencies": [
+      {
+        "dependency": "what is depended upon",
+        "type": "Technical/External/Internal",
+        "brd_reference": "section/page reference",
+        "confidence": "High/Medium/Low"
+      }
+    ]
+  },
+  "context": {
+    "business_context": {
+      "industry": "industry or domain",
+      "business_problem": "problem being solved",
+      "value_proposition": "expected business value",
+      "strategic_alignment": "how this aligns with business goals"
+    },
+    "user_personas": [
+      {
+        "persona_name": "descriptive name",
+        "role": "user role or job title",
+        "goals": ["goal1", "goal2"],
+        "pain_points": ["pain1", "pain2"],
+        "needs": ["need1", "need2"]
+      }
+    ],
+    "system_boundaries": {
+      "in_scope": ["capability or feature area that is in scope"],
+      "out_of_scope": ["capability or feature area that is explicitly out of scope"],
+      "interfaces": [
+        {
+          "system": "external system name",
+          "interaction_type": "API/File/Manual/etc",
+          "purpose": "why integration is needed"
+        }
+      ]
+    },
+    "external_integrations": [
+      {
+        "system_name": "name of external system",
+        "integration_type": "Real-time/Batch/Manual",
+        "data_flow": "Inbound/Outbound/Bidirectional",
+        "purpose": "business purpose of integration",
+        "criticality": "Critical/High/Medium/Low"
+      }
+    ],
+    "success_metrics": [
+      {
+        "metric_name": "name of metric",
+        "measurement": "how it's measured",
+        "target": "target value or range",
+        "category": "Business/Technical/User Experience"
+      }
+    ]
+  },
+  "user_stories": [
+    {
+      "story_id": "US-001",
+      "title": "Clear, descriptive title (5-8 words)",
+      "user_story": "As a [ROLE], I want [WHAT], so that [VALUE] (max 25 words)",
+      "epic": "Epic name/category",
+      "feature": "Feature name",
+      "importance": "2-3 sentences: Why it matters, how it contributes to epic goals, supports feature objectives",
+      "context": "Well-structured summary (50-100 words): Background, current situation, desired outcome, business drivers",
+      "recommended_steps": [
+        "Step 1: Concrete actionable task",
+        "Step 2: Next logical step",
+        "Step 3-6: Additional implementation steps"
+      ],
+      "risks": [
+        {
+          "risk": "Description of potential risk",
+          "mitigation": "Strategy to address the risk"
+        }
+      ],
+      "acceptance_criteria": [
+        "Given [context], When [action], Then [outcome]",
+        "The system shall [specific measurable requirement]"
+      ],
+      "brd_reference": "Traceability to original requirement",
+      "priority": "Critical/High/Medium/Low",
+      "story_points": 1-13
+    }
+  ],
+  "epic_groupings": [
+    {
+      "epic_name": "Name of epic grouping",
+      "epic_description": "Clear description of this epic theme",
+      "business_value": "Value delivered by this epic",
+      "story_ids": ["US-001", "US-002", "US-003"]
+    }
+  ],
+  "traceability_matrix": [
+    {
+      "requirement_id": "FR-001",
+      "story_ids": ["US-001"],
+      "coverage": "Full/Partial/Not Covered"
+    }
+  ]
+}
+
+USER STORY WRITING GUIDELINES:
+- Title: 5-8 words, descriptive
+- User Story: Max 25 words using "As a [ROLE], I want [WHAT], so that [VALUE]"
+- Importance: 2-3 sentences explaining why it matters
+- Context: 50-100 words with background, current state, desired outcome
+- Recommended Steps: 4-6 concrete, actionable implementation steps
+- Risks: 5 risks with mitigation strategies (technical, business, resource, integration, adoption)
+- Acceptance Criteria: 5-8 specific, testable Given-When-Then scenarios or "The system shall..." statements
+- Write in third person, clear, professional tone
+- Avoid jargon, buzzwords, marketing language
+- No words like: embark, elevate, unparalleled, unlock, leverage, synergy
+- Expand acronyms on first use
+- Focus on SMART framework (Specific, Measurable, Achievable, Relevant, Time-bound)
+
+COMPREHENSIVE ANALYSIS WORKFLOW:
+1. First pass: Extract ALL requirements from BRD (objectives, stakeholders, functional/non-functional, constraints, assumptions, risks, dependencies)
+2. Second pass: Synthesize context (business context, personas, boundaries, integrations, success metrics)
+3. Third pass: Generate user stories for EVERY functional requirement
+4. Final pass: Create epic groupings and traceability matrix
+
+Return ONLY the complete JSON object with ALL sections fully populated.

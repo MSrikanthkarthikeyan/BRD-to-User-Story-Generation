@@ -88,29 +88,33 @@ class ExportHandler:
             elements.append(Spacer(1, 0.1 * inch))
             
             for story in section.get('stories', []):
-                # Story table
+                # Story table with Paragraph objects for word wrapping
                 story_data = [
-                    ['Story ID', story.get('story_id', '')],
-                    ['Title', story.get('title', '')],
-                    ['Priority', story.get('priority', '')],
-                    ['User Story', story.get('user_story', '')],
-                    ['Story Points', story.get('story_points', '')],
-                    ['Dependencies', story.get('dependencies', 'None')]
+                    [Paragraph('<b>Story ID</b>', styles['Normal']), Paragraph(str(story.get('story_id', '')), styles['Normal'])],
+                    [Paragraph('<b>Title</b>', styles['Normal']), Paragraph(str(story.get('title', '')), styles['Normal'])],
+                    [Paragraph('<b>Priority</b>', styles['Normal']), Paragraph(str(story.get('priority', '')), styles['Normal'])],
+                    [Paragraph('<b>User Story</b>', styles['Normal']), Paragraph(str(story.get('user_story', '')), styles['Normal'])],
+                    [Paragraph('<b>Story Points</b>', styles['Normal']), Paragraph(str(story.get('story_points', '')), styles['Normal'])],
+                    [Paragraph('<b>Dependencies</b>', styles['Normal']), Paragraph(str(story.get('dependencies', 'None')), styles['Normal'])]
                 ]
                 
-                # Add acceptance criteria
-                ac_text = '\n'.join([f"• {ac}" for ac in story.get('acceptance_criteria', [])])
-                story_data.append(['Acceptance Criteria', ac_text])
+                # Add acceptance criteria with HTML line breaks
+                ac_list = story.get('acceptance_criteria', [])
+                ac_text = '<br/>'.join([f"• {ac}" for ac in ac_list]) if ac_list else 'None specified'
+                story_data.append([Paragraph('<b>Acceptance Criteria</b>', styles['Normal']), Paragraph(ac_text, styles['Normal'])])
                 
-                t = Table(story_data, colWidths=[1.5*inch, 5*inch])
+                t = Table(story_data, colWidths=[1.8*inch, 4.7*inch])
                 t.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#FFFEF0')),
                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#1F1F1F')),
                     ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0, 0), (-1, -1), 10),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
                     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                    ('LEFTPADDING', (0, 0), (-1, -1), 8),
+                    ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+                    ('TOPPADDING', (0, 0), (-1, -1), 8),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
                 ]))
                 
                 elements.append(t)

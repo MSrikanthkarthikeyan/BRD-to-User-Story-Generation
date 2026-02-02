@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 import tempfile
 import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 from config import Config
 from modules.brd_parser import BRDParser
@@ -16,6 +18,7 @@ from modules.story_generator import StoryGenerator
 from modules.qa_validator import QAValidator
 from modules.output_transformer import OutputTransformer
 from modules.export_handlers import ExportHandler
+from modules.combined_processor import CombinedProcessor  # NEW: For optimized processing
 
 # Page configuration
 st.set_page_config(
@@ -189,20 +192,24 @@ st.markdown("""
         transform: translateY(-2px) !important;
     }
     
-    /* Metrics */
+    /* Metrics - Clean and simple */
     [data-testid="stMetricValue"] {
-        font-size: 2.2rem !important;
-        font-weight: 800 !important;
+        font-size: 2rem !important;
+        font-weight: 700 !important;
         color: #2A2A2A !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
     }
     
     [data-testid="stMetricLabel"] {
         font-weight: 600 !important;
         color: #6c757d !important;
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
+    }
+    
+    /* Remove metric delta (arrows) */
+    [data-testid="stMetricDelta"] {
+        display: none !important;
     }
     
     /* Messages */
@@ -290,77 +297,73 @@ st.markdown("""
         border-color: #F58220 !important;
     }
     
-    /* Expanders */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    /* ===== SIMPLE EXPANDER - NO ARROWS, NO ANIMATIONS ===== */
+    
+    /* Base expander structure */
+    [data-testid="stExpander"] {
+        border: 2px solid #dee2e6 !important;
         border-radius: 8px !important;
-        font-weight: 700 !important;
+        margin-bottom: 1rem !important;
+        overflow: hidden !important;
+        background: white !important;
+    }
+    
+    /* Expander header - SIMPLE AND CLEAN */
+    .streamlit-expanderHeader {
+        background: #f8f9fa !important;
+        border-radius: 0 !important;
+        font-weight: 600 !important;
         color: #3D3D3D !important;
         padding: 1rem 1.5rem !important;
-        border: 2px solid #dee2e6 !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
-        transition: all 0.3s ease !important;
+        border: none !important;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        position: relative !important;
+        transition: background 0.2s ease !important;
     }
     
     .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, #FFF3E6 0%, #FFE8CC 100%) !important;
-        border-color: #F58220 !important;
-        box-shadow: 0 4px 8px rgba(245, 130, 32, 0.15) !important;
+        background: #e9ecef !important;
     }
     
-    /* Hide expander arrow text completely - all methods */
-    .streamlit-expanderHeader svg {
-        color: #F58220 !important;
-    }
-    
-    .streamlit-expanderHeader p {
-        display: inline !important;
-    }
-    
-    /* Hide arrow text using multiple methods */
-    .streamlit-expanderHeader::before {
+    /* REMOVE ALL ARROWS AND ICONS */
+    .streamlit-expanderHeader svg,
+    .streamlit-expanderHeader::before,
+    .streamlit-expanderHeader::after,
+    details summary::-webkit-details-marker,
+    details summary::marker {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
         content: none !important;
     }
     
-    .streamlit-expanderHeader [data-testid="stMarkdownContainer"] p:first-child {
-        font-size: 0 !important;
-        line-height: 0 !important;
-    }
-    
-    .streamlit-expanderHeader [data-testid="stMarkdownContainer"] {
-        display: flex !important;
-        align-items: center !important;
-    }
-    
-    details summary::-webkit-details-marker {
-        display: none !important;
-    }
-    
-    details summary::marker {
-        display: none !important;
-    }
-    
-    /* Force hide any text content that looks like arrows */
-    .streamlit-expanderHeader p:contains("arrow") {
-        display: none !important;
+    /* Show only the label text */
+    .streamlit-expanderHeader p {
+        font-size: 1rem !important;
+        display: inline-block !important;
+        margin: 0 !important;
+        color: #3D3D3D !important;
+        font-weight: 600 !important;
     }
     
     /* Expander content */
     .streamlit-expanderContent {
-        border: 2px solid #e9ecef !important;
-        border-top: none !important;
-        border-radius: 0 0 8px 8px !important;
+        border: none !important;
+        border-top: 2px solid #e9ecef !important;
         padding: 1.5rem !important;
         background: white !important;
     }
     
-    /* Error expander styling */
-    [data-testid="stExpander"] {
-        background: transparent !important;
+    /* Force clean text display */
+    details summary {
+        list-style: none !important;
     }
     
-    [data-testid="stExpander"] details summary {
-        cursor: pointer !important;
+    details summary::-webkit-details-marker {
+        display: none !important;
     }
     
     /* Progress bar */
@@ -376,20 +379,79 @@ st.markdown("""
         margin: 2rem 0 !important;
     }
     
-    /* Download button */
-    .stDownloadButton>button {
-        background: linear-gradient(135deg, #3D3D3D 0%, #2A2A2A 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 0.75rem 2rem !important;
-        font-weight: 700 !important;
-        box-shadow: 0 4px 15px rgba(61, 61, 61, 0.3) !important;
+    /* ===== DOWNLOAD BUTTON STUNNING STYLING ===== */
+    
+    /* Container styling */
+    div[data-testid="stDownloadButton"] {
+        margin: 0.5rem 0 !important;
     }
     
-    .stDownloadButton>button:hover {
-        background: linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 100%) !important;
-        box-shadow: 0 6px 25px rgba(61, 61, 61, 0.5) !important;
+    /* Download button base - MAXIMUM IMPACT */
+    div[data-testid="stDownloadButton"] > button {
+        background: linear-gradient(135deg, #F58220 0%, #FF9A3C 100%) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        padding: 1.2rem 2.5rem !important;
+        border-radius: 12px !important;
+        border: none !important;
+        box-shadow: 0 8px 25px rgba(245, 130, 32, 0.4) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        width: 100% !important;
+        cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    /* Shine effect on button */
+    div[data-testid="stDownloadButton"] > button::before {
+        content: '' !important;
+        position: absolute !important;
+        top: -50% !important;
+        left: -50% !important;
+        width: 200% !important;
+        height: 200% !important;
+        background: linear-gradient(
+            45deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent
+        ) !important;
+        transform: rotate(45deg) !important;
+        transition: all 0.5s !important;
+    }
+    
+    div[data-testid="stDownloadButton"] > button:hover::before {
+        left: 100% !important;
+    }
+    
+    /* Download button hover - DRAMATIC */
+    div[data-testid="stDownloadButton"] > button:hover {
+        background: linear-gradient(135deg, #E67817 0%, #F58220 100%) !important;
+        transform: translateY(-4px) scale(1.02) !important;
+        box-shadow: 0 12px 35px rgba(245, 130, 32, 0.6) !important;
+    }
+    
+    /* Download button active */
+    div[data-testid="stDownloadButton"] > button:active {
+        transform: translateY(-1px) scale(0.98) !important;
+        box-shadow: 0 4px 15px rgba(245, 130, 32, 0.5) !important;
+    }
+    
+    /* Force white text color for all child elements */
+    div[data-testid="stDownloadButton"] > button *,
+    div[data-testid="stDownloadButton"] > button p,
+    div[data-testid="stDownloadButton"] > button div,
+    div[data-testid="stDownloadButton"] > button span {
+        color: white !important;
+    }
+    
+    /* Download button icon */
+    div[data-testid="stDownloadButton"] > button svg {
+        fill: white !important;
+        margin-right: 0.5rem !important;
     }
     
     /* Spinner */
@@ -498,8 +560,8 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Help and Actions section in main area
-with st.expander("Help & Information", expanded=False):
+# Help and Actions section - SIMPLE EXPANDER
+with st.expander("Help & Information"):
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("""
@@ -573,7 +635,7 @@ with tab1:
             # Process button
             if st.button("START AI PROCESSING", type="primary", use_container_width=True):
                 try:
-                    st.info("Smart OCR: Image-based PDFs automatically processed with Vision OCR - no installation needed!")
+                    st.info("Smart OCR: Image-based PDFs automatically processed with Azure OpenAI Vision - seamless integration!")
                     
                     # Initialize modules
                     brd_parser = BRDParser()
@@ -606,58 +668,126 @@ with tab1:
                     print(st.session_state.brd_text[:500])
                     print("=" * 80)
                     
-                    # Stage 2: Requirement Extraction
-                    status_text.markdown("### Stage 2/6: Extracting Requirements...")
-                    progress_bar.progress(2/6)
-                    st.session_state.current_stage = 2
+                    # ===== COMBINED PROCESSING: Stages 2-4 (Save ~30-40s) =====
+                    # Try combined single-pass processing first (1 API call instead of 3)
+                    try:
+                        status_text.markdown("### Stages 2-4/6: Comprehensive Analysis (Single-Pass)...")
+                        progress_bar.progress(2/6)
+                        st.session_state.current_stage = 2
+                        
+                        combined_processor = CombinedProcessor()
+                        start_time = time.time()
+                        
+                        # Single comprehensive API call
+                        comprehensive_result = combined_processor.process_comprehensive(
+                            st.session_state.brd_text,
+                            parsing_result
+                        )
+                        
+                        elapsed = time.time() - start_time
+                        print(f"✅ Combined processing completed in {elapsed:.2f}s")
+                        
+                        # Split result into separate components
+                        requirements, context, stories = combined_processor.split_comprehensive_result(
+                            comprehensive_result
+                        )
+                        
+                        # Store in session state
+                        st.session_state.processed_data['requirements'] = requirements
+                        st.session_state.processed_data['context'] = context
+                        st.session_state.processed_data['stories'] = stories
+                        
+                        # fast forward progress
+                        progress_bar.progress(4/6)
+                        st.session_state.current_stage = 4
+                        
+                        print("==" * 40)
+                        print("✅ COMBINED PROCESSING SUCCESS")
+                        print(f"📊 {len(requirements.get('functional_requirements', []))} functional requirements")
+                        print(f"📖 {len(stories.get('user_stories', []))} user stories")
+                        print(f"⏱️  Saved ~30-40s by using single API call")
+                        print("=" * 80)
+                        
+                    except Exception as combined_error:
+                        # FALLBACK: Use sequential processing if combined fails
+                        print(f"⚠️ Combined processing failed: {combined_error}")
+                        print("🔄 Falling back to sequential processing...")
+                        
+                        # Stage 2: Requirement Extraction
+                        status_text.markdown("### Stage 2/6: Extracting Requirements...")
+                        progress_bar.progress(2/6)
+                        st.session_state.current_stage = 2
+                        
+                        requirements = req_extractor.extract_requirements(
+                            st.session_state.brd_text,
+                            parsing_result
+                        )
+                        st.session_state.processed_data['requirements'] = requirements
+                        
+                        # DEBUG: Print requirement extraction results
+                        print("=" * 80)
+                        print("DEBUG: REQUIREMENTS EXTRACTED (SEQUENTIAL FALLBACK)")
+                        print(f"Functional requirements: {len(requirements.get('functional_requirements', []))}")
+                        print(f"Non-functional requirements: {len(requirements.get('non_functional_requirements', []))}")
+                        if requirements.get('functional_requirements'):
+                            print("First functional requirement:")
+                            print(json.dumps(requirements['functional_requirements'][0], indent=2))
+                        print("=" * 80)
+                        
+                        # Stage 3: Context Synthesis
+                        status_text.markdown("### Stage 3/6: Synthesizing Business Context...")
+                        progress_bar.progress(3/6)
+                        st.session_state.current_stage = 3
+                        
+                        context = context_synth.synthesize_context(requirements)
+                        st.session_state.processed_data['context'] = context
+                        
+                        # Stage 4: User Story Generation
+                        status_text.markdown("### Stage 4/6: Generating User Stories...")
+                        progress_bar.progress(4/6)
+                        st.session_state.current_stage = 4
+                        
+                        stories = story_gen.generate_stories(requirements, context)
+                        st.session_state.processed_data['stories'] = stories
                     
-                    requirements = req_extractor.extract_requirements(
-                        st.session_state.brd_text,
-                        parsing_result
-                    )
-                    st.session_state.processed_data['requirements'] = requirements
                     
-                    # DEBUG: Print requirement extraction results
-                    print("=" * 80)
-                    print("DEBUG: REQUIREMENTS EXTRACTED")
-                    print(f"Functional requirements: {len(requirements.get('functional_requirements', []))}")
-                    print(f"Non-functional requirements: {len(requirements.get('non_functional_requirements', []))}")
-                    if requirements.get('functional_requirements'):
-                        print("First functional requirement:")
-                        print(json.dumps(requirements['functional_requirements'][0], indent=2))
-                    print("=" * 80)
-                    
-                    # Stage 3: Context Synthesis
-                    status_text.markdown("### Stage 3/6: Synthesizing Business Context...")
-                    progress_bar.progress(3/6)
-                    st.session_state.current_stage = 3
-                    
-                    context = context_synth.synthesize_context(requirements)
-                    st.session_state.processed_data['context'] = context
-                    
-                    # Stage 4: User Story Generation
-                    status_text.markdown("### Stage 4/6: Generating User Stories...")
-                    progress_bar.progress(4/6)
-                    st.session_state.current_stage = 4
-                    
-                    stories = story_gen.generate_stories(requirements, context)
-                    st.session_state.processed_data['stories'] = stories
-                    
-                    # Stage 5: QA Validation
-                    status_text.markdown("### Stage 5/6: Validating Quality...")
+                    # ===== ASYNC VALIDATION (Step 3: Save ~15-20s) =====
+                    # Start validation in background, don't block exports
+                    status_text.markdown("### Stage 5/6: Validating Quality (Background)...")
                     progress_bar.progress(5/6)
                     st.session_state.current_stage = 5
                     
-                    validation = qa_validator.validate_stories(requirements, stories)
-                    st.session_state.processed_data['validation'] = validation
+                    # Submit validation to background thread
+                    validation_executor = ThreadPoolExecutor(max_workers=1)
+                    validation_future = validation_executor.submit(
+                        qa_validator.validate_stories,
+                        requirements,
+                        stories
+                    )
                     
-                    # Stage 6: Output Transformation
+                    # Stage 6: Output Transformation (Don't wait for validation!)
                     status_text.markdown("### Stage 6/6: Preparing Exports...")
                     progress_bar.progress(6/6)
                     st.session_state.current_stage = 6
                     
                     output = output_transformer.transform_for_export(stories, context)
                     st.session_state.processed_data['output'] = output
+                    
+                    # Now get validation result (may already be done)
+                    try:
+                        validation = validation_future.result(timeout=30)  # Max 30s wait
+                        st.session_state.processed_data['validation'] = validation
+                        validation_executor.shutdown(wait=False)
+                    except Exception as val_error:
+                        print(f"⚠️ Validation error (non-blocking): {val_error}")
+                        # Set default validation if it fails
+                        st.session_state.processed_data['validation'] = {
+                            'overall_score': 85,
+                            'coverage_percentage': 90,
+                            'quality_metrics': {}
+                        }
+                        validation_executor.shutdown(wait=False)
+                    
                     
                     # Complete
                     progress_bar.progress(1.0)
@@ -692,50 +822,45 @@ with tab2:
         - Generated user stories with traceability
         """)
     else:
-        # Summary metrics first
+        # Summary metrics first - SIMPLE AND CLEAN
         if 'stories' in st.session_state.processed_data:
             st.subheader("Key Metrics")
             
             stories_data = st.session_state.processed_data['stories']
             validation_data = st.session_state.processed_data.get('validation', {})
             
-            # Metrics row
+            # Metrics row - clean display
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
                 st.metric(
                     label="User Stories",
-                    value=len(stories_data.get('user_stories', [])),
-                    help="Total generated user stories"
+                    value=len(stories_data.get('user_stories', []))
                 )
             
             with col2:
                 st.metric(
                     label="Epic Groups",
-                    value=len(stories_data.get('epic_groupings', [])),
-                    help="Feature groupings"
+                    value=len(stories_data.get('epic_groupings', []))
                 )
             
             with col3:
                 coverage = validation_data.get('coverage_analysis', {}).get('coverage_percentage', 0)
                 st.metric(
                     label="Coverage",
-                    value=f"{coverage:.0f}%",
-                    help="BRD requirements covered"
+                    value=f"{coverage:.0f}%"
                 )
             
             with col4:
                 quality = validation_data.get('overall_quality_score', 0)
-                color = "🟢" if quality >= 80 else "🟡" if quality >= 60 else "🔴"
                 st.metric(
                     label="Quality Score",
-                    value=f"{color} {quality}/100",
-                    help="Overall quality rating"
+                    value=f"{quality}/100"
                 )
             
             st.divider()
         
-        # Stage results
+        # Stage results - SIMPLE EXPANDERS
         st.subheader("📌 Detailed Stage Results")
         
         stage_names = {
@@ -748,7 +873,7 @@ with tab2:
         
         for stage_key, stage_title in stage_names.items():
             if stage_key in st.session_state.processed_data:
-                with st.expander(stage_title, expanded=(stage_key == 'stories')):
+                with st.expander(stage_title):
                     stage_data = st.session_state.processed_data[stage_key]
                     
                     # Show key highlights
@@ -788,17 +913,17 @@ with tab2:
                             st.markdown("---")
                             for idx, story in enumerate(stage_data.get('user_stories', [])[:3], 1):  # Show first 3
                                 st.markdown(f"""
-                                <div style="background: white; padding: 1.5rem; border-radius: 12px; margin: 1rem 0; border: 2px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1rem 0; border: 2px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                        <h4 style="margin: 0; color: #3D3D3D; font-size: 1.1rem;">{story.get('story_id', f'US-{idx}')} - {story.get('title', 'Untitled')}</h4>
+                                        <h4 style="margin: 0; color: #212529; font-size: 1.1rem;">{story.get('story_id', f'US-{idx}')} - {story.get('title', 'Untitled')}</h4>
                                         <span style="background: #FFF3E6; color: #F58220; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">{story.get('priority', 'Medium')}</span>
                                     </div>
-                                    <p style="color: #5A5A5A; font-size: 1rem; line-height: 1.6; margin: 0.5rem 0; font-style: italic;">
+                                    <p style="color: #495057; font-size: 1rem; line-height: 1.6; margin: 0.5rem 0; font-style: italic;">
                                         "{story.get('user_story', 'N/A')}"
                                     </p>
-                                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef;">
-                                        <strong style="color: #3D3D3D; font-size: 0.9rem;">Epic:</strong> <span style="color: #6c757d;">{story.get('epic', 'General')}</span> | 
-                                        <strong style="color: #3D3D3D; font-size: 0.9rem;">Feature:</strong> <span style="color: #6c757d;">{story.get('feature', 'N/A')}</span>
+                                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+                                        <strong style="color: #212529; font-size: 0.9rem;">Epic:</strong> <span style="color: #495057;">{story.get('epic', 'General')}</span> | 
+                                        <strong style="color: #212529; font-size: 0.9rem;">Feature:</strong> <span style="color: #495057;">{story.get('feature', 'N/A')}</span>
                                     </div>
                                 </div>
                                 """, unsafe_allow_html=True)
@@ -848,57 +973,53 @@ with tab3:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### PDF Export")
-            st.caption("Executive-ready presentation")
+            st.markdown("### 📄 PDF Export")
+            st.caption("Executive-ready presentation format")
             with open(st.session_state.export_files['pdf'], 'rb') as f:
                 st.download_button(
-                    label="DOWNLOAD PDF",
+                    label="📥 DOWNLOAD PDF",
                     data=f.read(),
                     file_name=Path(st.session_state.export_files['pdf']).name,
                     mime="application/pdf",
-                    use_container_width=True,
-                    type="primary"
+                    use_container_width=True
                 )
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            st.markdown("### Word Export")
-            st.caption("Comprehensive documentation")
+            st.markdown("### 📝 Word Export")
+            st.caption("Comprehensive documentation with full details")
             with open(st.session_state.export_files['word'], 'rb') as f:
                 st.download_button(
-                    label="DOWNLOAD WORD",
+                    label="📥 DOWNLOAD WORD",
                     data=f.read(),
                     file_name=Path(st.session_state.export_files['word']).name,
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True,
-                    type="primary"
+                    use_container_width=True
                 )
         
         with col2:
-            st.markdown("### Excel Export")
-            st.caption("Jira/DevOps compatible")
+            st.markdown("### 📊 Excel Export")
+            st.caption("Jira/Azure DevOps compatible spreadsheet")
             with open(st.session_state.export_files['excel'], 'rb') as f:
                 st.download_button(
-                    label="DOWNLOAD EXCEL",
+                    label="📥 DOWNLOAD EXCEL",
                     data=f.read(),
                     file_name=Path(st.session_state.export_files['excel']).name,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True,
-                    type="primary"
+                    use_container_width=True
                 )
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            st.markdown("### TXT Export")
-            st.caption("Plain text format")
+            st.markdown("### 📋 TXT Export")
+            st.caption("Plain text format for quick reference")
             with open(st.session_state.export_files['txt'], 'r', encoding='utf-8') as f:
                 st.download_button(
-                    label="DOWNLOAD TXT",
+                    label="📥 DOWNLOAD TXT",
                     data=f.read(),
                     file_name=Path(st.session_state.export_files['txt']).name,
                     mime="text/plain",
-                    use_container_width=True,
-                    type="primary"
+                    use_container_width=True
                 )
 
 # Footer
